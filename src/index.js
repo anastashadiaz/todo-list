@@ -14,7 +14,7 @@ const TodoComponent = React.createClass({
     let todos = this.state.todos;
     todos = todos.map(function(item, index) {
       return (
-        <TodoItem item={item} key={index} />
+        <TodoItem item={item} key={index} onDelete={this.onDelete} />
       );
     }.bind(this));
     return (
@@ -29,6 +29,15 @@ const TodoComponent = React.createClass({
     );
   },
 
+  // Custom functions
+  onDelete: function(item) {
+    let updatedTodos = this.state.todos.filter(function(val, index){
+      return item !== val;
+    });
+    this.setState({
+      todos: updatedTodos
+    });
+  },
   onAdd: function(item) {
     let updatedTodos = this.state.todos;
     updatedTodos.push(item);

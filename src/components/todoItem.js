@@ -7,10 +7,13 @@ const TodoItem = React.createClass({
       <li>
         <div className="item">
           <span className="item-name">{this.props.item}</span>
-          <span className="item-delete"> x </span>
+          <span className="item-delete" onClick={this.handleDelete}> x </span>
         </div>
       </li>
     );
+  },
+  handleDelete: function() {
+    this.props.onDelete(this.props.item);
   }
 });
 
