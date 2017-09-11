@@ -32,10 +32,10 @@ var TodoComponent = React.createClass({
   },
 
   render: function () {
-    var todos = this.state.todos;
+    let todos = this.state.todos;
     todos = todos.map(function(item, index){
       return(
-        <TodoItem item ={item} key = {index} onDelete = {this.onDelete}/>
+        <TodoItem item ={item} key={index} onDelete = {this.onDelete} onEdit={this.onEdit}/>
       );
     }.bind(this));
     return(
@@ -48,20 +48,31 @@ var TodoComponent = React.createClass({
   },// render
 
   onDelete: function(item){
-    var updatedTodos = this.state.todos.filter(function(val, index){
-      return item !== val;
-    });
+    console.log("you're deleting this item: " + item)
+    const array = this.state.todos;
+    const index = array.indexOf(item)
+    array.splice(index, 1);
     this.setState({
-      todos: updatedTodos
+      todos: array
     });
   },
 
   onAdd: function(item){
-    var updatedTodos = this.state.todos;
+    const updatedTodos = this.state.todos;
     updatedTodos.push(item);
     this.setState({
       todos: updatedTodos
     })
+  },
+
+  onEdit: function(item) {
+    const array = this.state.todos;
+    console.log(item.placeholder)
+    const index = array.indexOf(item.placeholder)
+    array[index] = item;
+    this.setState({
+      todos: array
+    });
   }
 })
 
