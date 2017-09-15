@@ -1,81 +1,97 @@
-import {BrowserRouter, Route} from 'react-router-dom'
-require('./css/index.css');
+import React from 'react'
+import ReactDOM from 'react-dom'
 
-var React = require('react');
-var ReactDOM = require('react-dom');
-
-// Module requires
-var TodoItem = require("./todoItem")
-var AddItem = require("./addItem")
-var About = require("./about")
-
-var App = React.createClass({
-  render: function(){
-    return(
-      <BrowserRouter>
-        <div>
-        <Route path ={'/'} component = {TodoComponent}></Route>
-        <Route path = {'/about'} component = {About}></Route>
-        </div>
-      </BrowserRouter>
-    );
-  }
-})
-
-
-//Create component
-var TodoComponent = React.createClass({
-  getInitialState: function () {
-    return{
-      todos: []
+class App extends React.Component {
+  constructor (props) {
+    super(props)
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleDelete = this.handleDelete.bind(this);
+    this.handleEdit = this.handleEdit.bind(this);
+    this.state = {
+      todos: {
+        1: { id: 1, content: 'eat' },
+        2: { id: 2, content: 'sleep '},
+        3: { id: 3, content: 'code '}
+      }
     }
-  },
-
-  render: function () {
-    let todos = this.state.todos;
-    todos = todos.map(function(item, index){
-      return(
-        <TodoItem item ={item} key={index} onDelete = {this.onDelete} onEdit={this.onEdit}/>
-      );
-    }.bind(this));
-    return(
-      <div id = "todo-list">
-        <h1>Todo mo mukha mo</h1>
-        <ul>{todos}</ul>
-        <AddItem onAdd = {this.onAdd} />
-      </div>
-    );
-  },// render
-
-  onDelete: function(item){
-    console.log("you're deleting this item: " + item)
-    const array = this.state.todos;
-    const index = array.indexOf(item)
-    array.splice(index, 1);
-    this.setState({
-      todos: array
-    });
-  },
-
-  onAdd: function(item){
-    const updatedTodos = this.state.todos;
-    updatedTodos.push(item);
-    this.setState({
-      todos: updatedTodos
-    })
-  },
-
-  onEdit: function(item) {
-    const array = this.state.todos;
-    console.log(item.placeholder)
-    const index = array.indexOf(item.placeholder)
-    array[index] = item;
-    this.setState({
-      todos: array
-    });
   }
-})
 
+  render () {
+    let me
+    return (
+      <div>
+        <p>Mama mo todo list</p>
+        <DaForm onSubmit={this.handleSubmit} name="Go mumshie" focus={true} />
+        <Todo todos={this.state.todos} onDelete={this.handleDelete} onEdit={this.handleEdit} />
+      </div>
+    )
+  }
 
-//put component into html page
-ReactDOM.render(<App/>, document.getElementById("todo-wrapper"));
+  handleEdit(key, content) {
+    console.error(key.content)
+    console.error(key.id)
+    this.setState({
+      todos: {...this.state.todos, [key.id]: {content, id: key.id}}
+    })
+    console.error(this.state.todos)
+  }
+
+  handleDelete(key) {
+    this.setState({
+      todos: {...this.state.todos, [key.id]:undefined}
+    })
+    console.error(this.state.todos)
+  }
+
+  handleSubmit(content) {
+    var newItem = {
+      [`${+Date.now()}`]: {
+        id: +(new Date()),
+        content: content
+      }
+    }
+    this.setState({
+      todos: {...this.state.todos, ...newItem}
+    })
+  }
+
+}
+
+const Todo = ({todos, onDelete, onEdit}) => {
+  return <ul>
+    {
+      Object.keys(todos).filter(id => todos[id] !== undefined).map( key => {
+        return <li>
+          {todos[key].content}
+          <button className="item-delete" onClick={() => onDelete(todos[key])}> &times; </button>
+          <DaForm onSubmit={(value) => onEdit(todos[key], value)} name="Submit"/>
+        </li>
+      })
+    }
+  </ul>
+}
+
+// const TodoItem = ({ todos, key, onDelete, onEdit }) => {
+//   return <div>
+//     <li>
+//     {console.error(key)}
+//       {todos[key].id} {todos[key].content}
+//       <button className="item-delete" onClick={() => onDelete(todos.id)}> &times; </button>
+//       <DaForm onSubmit={(value) => onEdit(todos.id, value)} name="Submit"/>
+//     </li>
+//   </div>
+// }
+
+const DaForm = ({onSubmit, name}) => {
+  let me
+  return <form onSubmit={e => {
+    e.preventDefault()
+    onSubmit(me.value)
+    me.value = ''
+  }} >
+    <input type="text" required ref={el => me = el} />
+    <input type="submit" value={name} />
+  </form>
+}
+
+ReactDOM.render(<App />, document.getElementById('todo-wrapper'));
