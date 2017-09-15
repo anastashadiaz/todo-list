@@ -7,11 +7,12 @@ class App extends React.Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
     this.handleEdit = this.handleEdit.bind(this);
+    this.showEditForm = this.showEditForm.bind(this);
     this.state = {
       todos: {
-        1: { id: 1, content: 'eat' },
-        2: { id: 2, content: 'sleep '},
-        3: { id: 3, content: 'code '}
+        1: { id: 1, content: 'eat', editable: false },
+        2: { id: 2, content: 'sleep', editable: false },
+        3: { id: 3, content: 'code ', editable: false }
       }
     }
   }
@@ -22,18 +23,21 @@ class App extends React.Component {
       <div>
         <p>Mama mo todo list</p>
         <DaForm onSubmit={this.handleSubmit} name="Go mumshie" focus={true} />
-        <Todo todos={this.state.todos} onDelete={this.handleDelete} onEdit={this.handleEdit} />
+        <Todo todos={this.state.todos} onDelete={this.handleDelete} onEdit={this.handleEdit} showEditForm={this.showEditForm} />
       </div>
     )
   }
 
   handleEdit(key, content) {
-    console.error(key.content)
-    console.error(key.id)
     this.setState({
       todos: {...this.state.todos, [key.id]: {content, id: key.id}}
     })
-    console.error(this.state.todos)
+  }
+
+  showEditForm(key) {
+    this.setState({
+      todos: {...this.state.todos, [key.id]: {content: key.content, id: key.id, editable: true}}
+    })
   }
 
   handleDelete(key) {
@@ -57,14 +61,17 @@ class App extends React.Component {
 
 }
 
-const Todo = ({todos, onDelete, onEdit}) => {
+const Todo = ({todos, onDelete, onEdit, showEditForm}) => {
   return <ul>
     {
       Object.keys(todos).filter(id => todos[id] !== undefined).map( key => {
         return <li>
-          {todos[key].content}
+          {todos[key].id} {todos[key].content}
           <button className="item-delete" onClick={() => onDelete(todos[key])}> &times; </button>
-          <DaForm onSubmit={(value) => onEdit(todos[key], value)} name="Submit"/>
+          { todos[key].editable ?
+            <DaForm onSubmit={(value) => onEdit(todos[key], value)} name="Submit"/>
+            : <button onClick={() => showEditForm(todos[key])}>Edit</button>
+          }
         </li>
       })
     }
